@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Конфигуратор вездеходов</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    /* Ваши стили без изменений, но можно добавить переменные темы */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: var(--tg-theme-bg-color, #f6f5ec);
+      color: var(--tg-theme-text-color, #2b2a28);
+    }
+    /* все остальные стили остаются как в вашем коде */
+    /* ... (скопируйте сюда все стили из вашего кода) ... */
+  </style>
+</head>
+<body>
+<div class="configurator">
+  <div class="sidebar">
+    <h2>Модели</h2>
+    <div class="buttons-container">
+      <button id="btn-finist" onclick="selectModel('finist')">ФИНИСТ</button>
+      <button id="btn-profi" onclick="selectModel('profi')">ФИНИСТ ПРО</button>
+      <button id="btn-pikap" onclick="selectModel('pikap')">ФИНИСТ Пикап</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="card preview" id="preview">
+      <h2>Выберите модель</h2>
+    </div>
+    <div class="card options" id="options">
+      <h2>Опции</h2>
+      <div class="options-list"><p>Сначала выберите модель</p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Telegram WebApp инициализация ---
+  const tg = window.Telegram.WebApp;
+  tg.expand();  // растянуть на весь экран
+  // Применить цвета темы Telegram (опционально)
+  const setTheme = () => {
+    const bg = tg.themeParams.bg_color || '#f6f5ec';
+    const text = tg.themeParams.text_color || '#2b2a28';
+    document.body.style.backgroundColor = bg;
+    document.body.style.color = text;
+  };
+  setTheme();
+
+  // ---- Ваш существующий объект models (без изменений) ----
+  const models = { ... };  // скопируйте сюда ваш объект models целиком
+
+  let currentModel = null;
+
+  function formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  }
+
+  function selectModel(key) { /* без изменений */ }
+  function renderPreview() { /* без изменений */ }
+  function renderOptions() {
+    // ... ваш код ...
+    // В конце добавьте настройку главной кнопки
+    if (currentModel) {
+      tg.MainButton.setText("Оформить заказ");
+      tg.MainButton.onClick(() => sendOrder());
+      tg.MainButton.show();
+    }
+  }
+  function updateTotal() { /* без изменений */ }
+
+  // --- Новая функция отправки заказа ---
+  function sendOrder() {
+    if (!currentModel) return;
+    
+    const selectedOptions = [];
+    document.querySelectorAll('.option input[type="checkbox"]:checked').forEach(ch => {
+      const optDiv = ch.closest('.option');
+      const name = optDiv.querySelector('.name')?.innerText || 'Опция';
+      const price = parseInt(ch.value, 10);
+      selectedOptions.push({ name, price });
+    });
+
+    const total = currentModel.basePrice + selectedOptions.reduce((s, opt) => s + opt.price, 0);
+    const orderData = {
+      model: currentModel.name,
+      base_price: currentModel.basePrice,
+      selected_options: selectedOptions,
+      total_price: total,
+      timestamp: new Date().toISOString()
+    };
+
+    tg.sendData(JSON.stringify(orderData));
+    tg.MainButton.setText("Отправлено ✓");
+    tg.MainButton.disable();
+    setTimeout(() => tg.close(), 1500);
+  }
+
+  // --- Слайдер и события мыши/тач (оставьте как есть) ---
+  let currentSlide = 0;
+  function changeSlide(n) { ... }
+  function goToSlide(n) { ... }
+  function showSlide(n) { ... }
+
+  // Инициализация
+  selectModel('finist');
+</script>
+</body>
+</html>
